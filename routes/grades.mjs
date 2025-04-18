@@ -2,6 +2,8 @@ import express from "express";
 import db from "../db/conn.mjs";
 import { ObjectId } from "mongodb";
 
+import Learner from "../models/learner.mjs";
+
 const router = express.Router();
 
 // Create a single grade entry
@@ -21,9 +23,11 @@ router.post("/", async (req, res) => {
 
 // Get a single grade entry
 router.get("/:id", async (req, res) => {
-  let collection = await db.collection("grades");
-  let query = { _id: ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
+  // let collection = await db.collection("grades");
+  // let query = { _id: ObjectId(req.params.id) };
+  // let result = await collection.findOne(query);
+
+  let result = await Learner.findById(req.params.id);
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
@@ -67,18 +71,22 @@ router.delete("/:id", async (req, res) => {
 
 // Get route for backwards compatibility
 router.get("/student/:id", async (req, res) => {
-  res.redirect(`learner/${req.params.id}`);
+  console.log("Redirecting...");
+  res.redirect(`/grades/learner/${req.params.id}`);
 });
 
 // Get a learner's grade data
 router.get("/learner/:id", async (req, res) => {
-  let collection = await db.collection("grades");
+  // // mongodb way
+  // let collection = await db.collection("grades");
   let query = { learner_id: Number(req.params.id) };
 
-  // Check for class_id parameter
+  // // Check for class_id parameter
   if (req.query.class) query.class_id = Number(req.query.class);
 
-  let result = await collection.find(query).toArray();
+  // let result = await collection.find(query).toArray();
+
+  let result = await Learner.find(query);
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
@@ -97,13 +105,15 @@ router.delete("/learner/:id", async (req, res) => {
 
 // Get a class's grade data
 router.get("/class/:id", async (req, res) => {
-  let collection = await db.collection("grades");
+  // let collection = await db.collection("grades");
   let query = { class_id: Number(req.params.id) };
 
   // Check for learner_id parameter
   if (req.query.learner) query.learner_id = Number(req.query.learner);
 
-  let result = await collection.find(query).toArray();
+  // let result = await collection.find(query).toArray();
+
+  let result = await Learner.find(query);
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);

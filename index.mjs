@@ -1,7 +1,14 @@
 import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
 const PORT = 5050;
 const app = express();
+
+// Mongoose connection established
+const collection = "sample_training";
+await mongoose.connect(process.env.ATLAS_URI + collection);
 
 import grades from "./routes/grades.mjs";
 import grades_agg from "./routes/grades_agg.mjs";
