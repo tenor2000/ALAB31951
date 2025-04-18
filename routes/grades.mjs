@@ -8,8 +8,10 @@ const router = express.Router();
 
 // Create a single grade entry
 router.post("/", async (req, res) => {
-  let collection = await db.collection("grades");
-  let newDocument = req.body;
+  // let collection = await db.collection("grades");
+  // let newDocument = req.body;
+
+  let newDocument = new Learner(req.body);
 
   // rename fields for backwards compatibility
   if (newDocument.student_id) {
@@ -17,8 +19,11 @@ router.post("/", async (req, res) => {
     delete newDocument.student_id;
   }
 
-  let result = await collection.insertOne(newDocument);
-  res.send(result).status(204);
+  // let result = await collection.insertOne(newDocument);
+
+  await newDocument.save();
+
+  res.send(newDocument).status(201);
 });
 
 // Get a single grade entry
@@ -61,9 +66,11 @@ router.patch("/:id/remove", async (req, res) => {
 
 // Delete a single grade entry
 router.delete("/:id", async (req, res) => {
-  let collection = await db.collection("grades");
-  let query = { _id: ObjectId(req.params.id) };
-  let result = await collection.deleteOne(query);
+  // let collection = await db.collection("grades");
+  // let query = { _id: ObjectId(req.params.id) };
+  // let result = await collection.deleteOne(query);
+
+  let result = await Learner.deleteOne({ _id: req.params.id });
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
@@ -94,10 +101,12 @@ router.get("/learner/:id", async (req, res) => {
 
 // Delete a learner's grade data
 router.delete("/learner/:id", async (req, res) => {
-  let collection = await db.collection("grades");
-  let query = { learner_id: Number(req.params.id) };
+  // let collection = await db.collection("grades");
+  // let query = { learner_id: Number(req.params.id) };
 
-  let result = await collection.deleteOne(query);
+  // let result = await collection.deleteOne(query);
+
+  let result = await Learner.deleteOne({ learner_id: req.params.id });
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
@@ -134,10 +143,12 @@ router.patch("/class/:id", async (req, res) => {
 
 // Delete a class
 router.delete("/class/:id", async (req, res) => {
-  let collection = await db.collection("grades");
-  let query = { class_id: Number(req.params.id) };
+  // let collection = await db.collection("grades");
+  // let query = { class_id: Number(req.params.id) };
 
-  let result = await collection.deleteMany(query);
+  // let result = await collection.deleteMany(query);
+
+  let result = await Learner.deleteMany({ class_id: req.params.id });
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
